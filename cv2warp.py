@@ -3,6 +3,7 @@
 import cv2
 import numpy as np
 from homography import myHomography
+from myWarpPerspective import myWarpPerspective
 
 # Read in the skewed image
 skewed_image=cv2.imread("skewed_check.jpg")
@@ -29,7 +30,8 @@ h = myHomography(original_coords, desired_coords)
 # print(h)
 
 # Warp the image
-cv_Homography = cv2.warpPerspective(skewed_image, h, (800, 800))
+# cv_Homography = cv2.warpPerspective(skewed_image, h, (800, 800))
+cv_Homography = myWarpPerspective(skewed_image, h, (800, 800))
 
 # showing flat image
 cv2.imshow("cv_Homography", cv_Homography), cv2.waitKey(1)
