@@ -2,6 +2,7 @@
 #import required packages
 import cv2
 import numpy as np
+from datetime import datetime
 
 # import my packages
 from homography import myHomography
@@ -26,7 +27,7 @@ desired_coords = np.array([[0, 0], [800, 0], [800, 800], [0, 800]])
 # print(type(cvh))
 # print(cvh) ###
 
-# Homography processing to make flat image
+# Compute Homography matrix to make flat image from warped
 h = myHomography(original_coords, desired_coords)
 # print(type(h))
 # print(h)
@@ -47,15 +48,19 @@ else:
 	print("Image '"+str(imgpath)+"' imported properly.")
 
 
-print("Started warp. Please be patient - this will take about 5 seconds.")
+print("Started warp. Please be patient - this may take a few seconds.")
 
-
-
+#Time the warp operation
+start = datetime.now()
 
 # Warp the image
 #cv_Homography = cv2.warpPerspective(skewed_image, h, (800, 800))
 cv_Homography = myWarpPerspective(skewed_image, h, (800, 800))
 
+end = datetime.now()
+runtime=end-start
+#runtime=runtime.strftime("%H:%M:%S")
+print("Finished warp in "+str(runtime)+" (hours:min:sec)")
 
 
 # showing flat image
