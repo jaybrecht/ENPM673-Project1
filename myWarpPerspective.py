@@ -49,7 +49,7 @@ def myWarpPerspective(skewed_image, Homography, dimensions):
 				new_image[skewx[i],skewy[i],2]=skewed_image[newx,newy,2]
 			i+=1
 
-
+	new_image=cv2.flip(new_image, -1)
 
 
 
