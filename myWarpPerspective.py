@@ -73,9 +73,9 @@ def myWarpPerspective(skewed_image, Homography, dimensions):
 	# 			new_image[x,y,1]=skewed_image[skewx,skewy,1]
 	# 			new_image[x,y,2]=skewed_image[skewx,skewy,2]
 
-	cv2.imshow("new image", new_image)
-	cv2.waitKey(0)
+	# cv2.imshow("new image", new_image)
+	# cv2.waitKey(0)
 
-
+	return new_image
 
 
