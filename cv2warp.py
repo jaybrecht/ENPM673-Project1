@@ -37,6 +37,7 @@ h = myHomography(original_coords, desired_coords)
 
 # Read in the skewed image
 skewed_image=cv2.imread(imgpath)
+
 # Check that the image exists
 if skewed_image is None:
 	print("Error: Couldn't import '"+str(imgpath)+"'. Check that the file path and name are correct.")
@@ -58,8 +59,8 @@ cv_Homography = myWarpPerspective(skewed_image, h, (800, 800))
 
 
 # showing flat image
-#cv2.imshow("cv_Homography", cv_Homography), cv2.waitKey(1)
-#cv2.waitKey(0)
+cv2.imshow("Unwarped image", cv_Homography)
+cv2.waitKey(0)
 
 
 
