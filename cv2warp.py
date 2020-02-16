@@ -10,7 +10,7 @@ from myWarpPerspective import myWarpPerspective
 print("Started. Please be patient - this will take about 5 seconds.")
 
 # Read in the skewed image
-skewed_image=cv2.imread("skewed_check.jpg")
+skewed_image=cv2.imread("skewed_colors.jpg")
 
 # Define coordinates of corners (clockwise around from the top left)
 point1=[240,11]
@@ -34,7 +34,7 @@ h = myHomography(original_coords, desired_coords)
 # print(h)
 
 # Warp the image
-# cv_Homography = cv2.warpPerspective(skewed_image, h, (800, 800))
+#cv_Homography = cv2.warpPerspective(skewed_image, h, (800, 800))
 cv_Homography = myWarpPerspective(skewed_image, h, (800, 800))
 
 
