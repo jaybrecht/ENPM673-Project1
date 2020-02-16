@@ -8,16 +8,17 @@ def myWarpPerspective(skewed_image, Homography, dimensions):
 	# and dimensions for a new image (width, height)
 	# It warps the skewed image according to the homography
 
-
 	# Establish key variables
 	width=dimensions[0]
 	height=dimensions[1]
 	H=Homography
-	#H=cv2.invert(H)[1]
+	#H=cv2.invert(H)[1] #Uncomment if you want to warp in reverse
 	#print(H)
 
-	# Create a new image, all black
-	new_image=np.zeros((width,height,3),dtype="uint8")
+	# Create a new image, all white
+	new_image=np.full((width,height,3),255,dtype="uint8")
+	
+	#new_image=np.empty((width,height,3),dtype="uint8")
 
 
 	#https://stackoverflow.com/questions/44457064/displaying-stitched-images-together-without-cutoff-using-warpaffine/44459869#44459869
@@ -49,9 +50,12 @@ def myWarpPerspective(skewed_image, Homography, dimensions):
 				new_image[skewx[i],skewy[i],2]=skewed_image[newx,newy,2]
 			i+=1
 
+	# Uncomment these if you want to warp in reverse (take a square image and warp it)
+	# new_image=cv2.rotate(new_image, cv2.ROTATE_90_CLOCKWISE)
+	# new_image=cv2.flip(new_image, 1)
+
+	#Comment this out if you want to warp in reverse
 	new_image=cv2.flip(new_image, -1)
-
-
 
 	# Warp Transform Calculation
 	# for x in range (0,width):
