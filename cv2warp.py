@@ -48,7 +48,7 @@ else:
 	print("Image '"+str(imgpath)+"' imported properly.")
 
 
-print("Started warp. Please be patient - this may take a few seconds.")
+print("Starting warp. Please be patient - this may take a few seconds.")
 
 #Time the warp operation
 start = datetime.now()
@@ -58,9 +58,8 @@ start = datetime.now()
 cv_Homography = myWarpPerspective(skewed_image, h, (800, 800))
 
 end = datetime.now()
-runtime=end-start
-#runtime=runtime.strftime("%H:%M:%S")
-print("Finished warp in "+str(runtime)+" (hours:min:sec)")
+warptime=end-start
+print("Finished warp in "+str(warptime)+" (hours:min:sec)")
 
 
 # showing flat image
