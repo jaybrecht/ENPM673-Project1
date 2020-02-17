@@ -1,7 +1,23 @@
 import cv2
 import numpy as np
 
+from squareWarper import squareWarper
+
 video = cv2.VideoCapture('data/data_1.mp4') 
+
+imgpath="tucker.JPG"
+
+# Read in the square image
+square_image=cv2.imread(imgpath)
+
+# Check that the image exists
+if square_image is None:
+    print("Error: Couldn't import '"+str(imgpath)+"'. Check that the file path and name are correct.")
+    print("Exiting...")
+    exit()
+else:
+    print("Image '"+str(imgpath)+"' imported properly.")
+
 
 while(video.isOpened()):
     ret, frame = video.read()
@@ -58,7 +74,10 @@ while(video.isOpened()):
             y = corner[1]
             cv2.circle(frame,(x,y),5,255,-1)
 
-    cv2.imshow("Corners",frame)
+    #cv2.imshow("Corners",frame)
+
+    newframe=squareWarper(coords[0],frame,square_image)
+    cv2.imshow("dog!",newframe)
  
     if cv2.waitKey(1) == ord('q'):
         break
