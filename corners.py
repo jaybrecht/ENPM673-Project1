@@ -37,21 +37,28 @@ while(video.isOpened()):
         if parent[i] not in new_lst:
             new_lst2.append(i)
 
+    coords = []
     for i in new_lst2:
+        blank = np.zeros((height, width, channels), dtype = "uint8")
         cv2.drawContours(blank,contours,i,(255,255,255), 4)
+        gray = cv2.cvtColor(blank,cv2.COLOR_BGR2GRAY)
+        gray = np.float32(gray)
+        num_corners = 4
+        corners = cv2.goodFeaturesToTrack(gray, num_corners, .1, 100)
+        corners = np.int0(corners)
+        contour_corner = []
+        for corner in corners:
+            x,y = corner.ravel()
+            contour_corner.append([x,y])
+        coords.append(contour_corner)
 
-    gray = cv2.cvtColor(blank,cv2.COLOR_BGR2GRAY)
-    gray = np.float32(gray)
-    num_corners = 4
-    corners = cv2.goodFeaturesToTrack(gray, num_corners, .1, 100)
-    corners = np.int0(corners)
-
-    for corner in corners:
-        x,y = corner.ravel()
-        cv2.circle(frame,(x,y),5,255,-1)
+    for shape in coords:
+        for corner in shape:
+            x = corner[0]
+            y = corner[1]
+            cv2.circle(frame,(x,y),5,255,-1)
 
     cv2.imshow("Corners",frame)
-    cv2.imshow("Contours",blank)
-
+ 
     if cv2.waitKey(1) == ord('q'):
         break
