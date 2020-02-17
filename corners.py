@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 
-
+video = cv2.VideoCapture('data/data_1.mp4') 
 imgpath="Tucker.JPG"
 
 # Read in the square image
@@ -15,7 +15,6 @@ if square_image is None:
     exit()
 else:
     print("Image '"+str(imgpath)+"' imported properly.")
-
 
 while(video.isOpened()):
     ret, frame = video.read()
@@ -61,6 +60,7 @@ while(video.isOpened()):
             cv2.circle(frame,(p[0][0],p[0][1]),5,(0,0,255),-1)
         corners.append(coords)
 
-
+    cv2.imshow("Corners",frame)
+    cv2.imshow("Contours",blank)
     if cv2.waitKey(1) == ord('q'):
         break
