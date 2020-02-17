@@ -5,7 +5,7 @@ from squareWarper import squareWarper
 
 video = cv2.VideoCapture('data/data_1.mp4') 
 
-imgpath="tucker.JPG"
+imgpath="Tucker.JPG"
 
 # Read in the square image
 square_image=cv2.imread(imgpath)
