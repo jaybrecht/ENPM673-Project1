@@ -6,9 +6,20 @@ from datetime import datetime
 
 # import my packages
 from homography import myHomography
-from myWarpPerspective import myWarpPerspective
+from myWarpPerspective import square2Warp
 
-imgpath="skewed_colors.jpg"
+imgpath="tucker.JPG"
+
+# Read in the skewed image
+skewed_image=cv2.imread(imgpath)
+
+# Check that the image exists
+if skewed_image is None:
+	print("Error: Couldn't import '"+str(imgpath)+"'. Check that the file path and name are correct.")
+	print("Exiting...")
+	exit()
+else:
+	print("Image '"+str(imgpath)+"' imported properly.")
 
 
 # Define coordinates of corners (clockwise around from the top left)
@@ -36,16 +47,7 @@ h = myHomography(original_coords, desired_coords)
 
 
 
-# Read in the skewed image
-skewed_image=cv2.imread(imgpath)
 
-# Check that the image exists
-if skewed_image is None:
-	print("Error: Couldn't import '"+str(imgpath)+"'. Check that the file path and name are correct.")
-	print("Exiting...")
-	exit()
-else:
-	print("Image '"+str(imgpath)+"' imported properly.")
 
 
 print("Starting warp. Please be patient - this may take a few seconds.")
@@ -55,7 +57,7 @@ start = datetime.now()
 
 # Warp the image
 #cv_Homography = cv2.warpPerspective(skewed_image, h, (800, 800))
-cv_Homography = myWarpPerspective(skewed_image, h, (800, 800))
+cv_Homography = square2Warp(skewed_image, h, (800, 800))
 
 end = datetime.now()
 warptime=end-start
