@@ -124,4 +124,55 @@ def warp2square(orig_points,H,dim):
     ret, square_img = cv2.threshold(imgray, 200, 255, cv2.THRESH_BINARY)
     return square_img
 
+def encode_tag(square_img):
+    dim = square_img.shape[0]
+    grid_size = 8
+    k = dim//grid_size
+    sx = 0
+    sy = 0
+    encoding = np.zeros((grid_size,grid_size))
+    for i in range(grid_size):
+        for j in range(grid_size):
+            roi = square_img[sy:sy+k, sx:sx+k]
+            cv2.rectangle(square_img,(sx,sy),(sx+k,sy+k),(150),2)
+            if roi.mean() > 255//2:
+                encoding[i][j] = 1
+            sx += k
+        sx = 0
+        sy += k
+    if encoding[5,5] == 1:
+        orientation = 0
+    elif encoding[2,5] == 1:
+        orientation = 1
+    elif encoding[2,2] == 1:
+        orientation = 2
+    elif encoding[5,2] == 1:
+        orientation = 3
+    # cv2.imshow("Tag",square_img)
+    # cv2.waitKey(0)
+    return [square_img,orientation]
 
+def rotate_img(new_img,orientation):
+    (h, w) = new_img.shape[:2]
+    center = (w/2, h/2)
+    angle = orientation*90
+    M = cv2.getRotationMatrix2D(center, angle, 1)
+    rotated_img = cv2.warpAffine(new_img, M, (h, w))
+    return rotated_img
+
+def square2warp(frame,new_img,H_inv):
+    (h, w) = new_img.shape[:2]
+    y,x=np.indices((h,w))
+    old=np.stack((x.ravel(),y.ravel(),np.ones(y.size)))
+    new=H_inv.dot(old)
+    new/=new[2]
+    for i in range(len(new[0])-1):
+        new_x = int(new[0][i])
+        new_y = int(new[1][i])
+        if new_x<0 or new_y<0:
+            pass
+        else:
+            old_x = int(old[0][i])
+            old_y = int(old[1][i])
+            frame[new_x,new_y] = new_img[old_x,old_y]  
+    return frame
