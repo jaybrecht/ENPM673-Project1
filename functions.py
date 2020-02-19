@@ -140,25 +140,36 @@ def encode_tag(square_img):
             sx += k
         sx = 0
         sy += k
+    # Id is contained in the inner four elements of the tag
+    # a  b
+    # d  c
+    a = str(int(encoding[3][3]))
+    b = str(int(encoding[3][4]))
+    c = str(int(encoding[4][4]))
+    d = str(int(encoding[4][3]))
     if encoding[5,5] == 1:
         orientation = 0
-        center = (5*k+(k//2),5*k+(k//2))
-        cv2.circle(square_img,center,k//4,125)
+        id_str = a+b+c+d
+        # center = (5*k+(k//2),5*k+(k//2))
+        # cv2.circle(square_img,center,k//4,125)
     elif encoding[5,2] == 1:
         orientation = 1
-        center = (2*k+(k//2),5*k+(k//2))
-        cv2.circle(square_img,center,k//4,125)
+        id_str = b+c+d+a
+        # center = (2*k+(k//2),5*k+(k//2))
+        # cv2.circle(square_img,center,k//4,125)
     elif encoding[2,2] == 1:
         orientation = 2
-        center = (2*k+(k//2),2*k+(k//2))
-        cv2.circle(square_img,center,k//4,125)
+        id_str = c+d+a+b
+        # center = (2*k+(k//2),2*k+(k//2))
+        # cv2.circle(square_img,center,k//4,125)
     elif encoding[2,5] == 1:
         orientation = 3
-        center = (5*k+(k//2),2*k+(k//2))
-        cv2.circle(square_img,center,k//4,125)
+        id_str = d+a+b+c
+        # center = (5*k+(k//2),2*k+(k//2))
+        # cv2.circle(square_img,center,k//4,125)
     # cv2.imshow("Tag",square_img)
     # cv2.waitKey(0)
-    return [square_img,orientation]
+    return [square_img,id_str,orientation]
 
 def rotate_img(new_img,orientation):
     (h, w) = new_img.shape[:2]
