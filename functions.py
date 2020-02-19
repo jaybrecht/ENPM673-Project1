@@ -7,19 +7,19 @@ def findcontours(frame,threshold):
     imgray= cv2.medianBlur(imgray,5)
     ret, thresh = cv2.threshold(imgray, threshold, 255, cv2.THRESH_BINARY)
 
-    cnts, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+    all_cnts, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
 
     # remove any contours that do not have a parent or child
     wrong_cnts = []
     for i,h in enumerate(hierarchy[0]):
         if h[2] == -1 or h[3] == -1:
             wrong_cnts.append(i)
-    cnts = [c for i, c in enumerate(cnts) if i not in wrong_cnts]
+    cnts = [c for i, c in enumerate(all_cnts) if i not in wrong_cnts]
 
     # sort the contours to include only the three largest
     cnts = sorted(cnts, key = cv2.contourArea, reverse = True)[:3]
 
-    return cnts
+    return [all_cnts,cnts]
 
 def approx_quad(cnts):
     tag_cnts = []
@@ -112,7 +112,7 @@ def warp2square(orig_points,H,dim):
     old_points = np.stack((np.array(x),np.array(y),np.ones(len(x))))
     new_points=H.dot(old_points)
     new_points/=new_points[2]
-    square_img =np.full((dim,dim,3),255,dtype="uint8")
+    square_img =np.full((dim,dim,3),255//2,dtype="uint8")
     for i in range(len(new_points[0])-1):
         new_x = int(new_points[0][i])
         new_y = int(new_points[1][i])
@@ -143,32 +143,32 @@ def encode_tag(square_img):
     # Id is contained in the inner four elements of the tag
     # a  b
     # d  c
+
     a = str(int(encoding[3][3]))
     b = str(int(encoding[3][4]))
     c = str(int(encoding[4][4]))
     d = str(int(encoding[4][3]))
     if encoding[5,5] == 1:
-        orientation = 0
+        orientation = 1
         id_str = a+b+c+d
         # center = (5*k+(k//2),5*k+(k//2))
         # cv2.circle(square_img,center,k//4,125)
     elif encoding[5,2] == 1:
-        orientation = 1
+        orientation = 2
         id_str = b+c+d+a
         # center = (2*k+(k//2),5*k+(k//2))
         # cv2.circle(square_img,center,k//4,125)
     elif encoding[2,2] == 1:
-        orientation = 2
+        orientation = 3
         id_str = c+d+a+b
         # center = (2*k+(k//2),2*k+(k//2))
         # cv2.circle(square_img,center,k//4,125)
     elif encoding[2,5] == 1:
-        orientation = 3
+        orientation = 0
         id_str = d+a+b+c
         # center = (5*k+(k//2),2*k+(k//2))
         # cv2.circle(square_img,center,k//4,125)
-    # cv2.imshow("Tag",square_img)
-    # cv2.waitKey(0)
+
     return [square_img,id_str,orientation]
 
 def rotate_img(new_img,orientation):

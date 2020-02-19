@@ -5,9 +5,9 @@ from cube import*
 
 video = cv2.VideoCapture('data/data_3.mp4') 
 
-fourcc = cv2.VideoWriter_fourcc(*'XVID')
-fps_out = 29
-out = cv2.VideoWriter('output.avi', fourcc, fps_out, (1920, 1080))
+# fourcc = cv2.VideoWriter_fourcc(*'XVID')
+# fps_out = 29
+# out = cv2.VideoWriter('output.avi', fourcc, fps_out, (1920, 1080))
 
 K=np.array([[1406.08415449821,0,0],
            [2.20679787308599, 1417.99930662800,0],
@@ -16,17 +16,23 @@ K=np.array([[1406.08415449821,0,0],
 tag_ids = ['0101','0111','1111']
 img_paths = ['data/Tucker.jpg','data/Hailey.jpg','data/Tessa.jpg']
 
-print("Writing to Video, Please Wait")
-count = 1
+# print("Writing to Video, Please Wait")
+
+start_frame = 67
+count = start_frame
+video.set(1,start_frame)
 while(video.isOpened()):
     print("Current frame:" + str(count))
     count += 1
     ret, frame = video.read()
     #find correct contours
-    cnts = findcontours(frame,190)
+    [all_cnts,cnts] = findcontours(frame,175)
     #approximate quadralateral to each contour and extract corners
     [tag_cnts,corners] = approx_quad(cnts)
-    # cv2.drawContours(frame,tag_cnts,-1,(255,0,0), 4)
+    cv2.drawContours(frame,all_cnts,-1,(0,255,0), 4)
+    cv2.drawContours(frame,tag_cnts,-1,(255,0,0), 4)
+    # frame_orig = frame.copy()
+    # cv2.imshow("Orig Frame",frame_orig)
     for i,tag in enumerate(corners):        
         #find list of points in each tag
         orig_points = points_in_poly(frame,tag_cnts[i])
@@ -41,6 +47,9 @@ while(video.isOpened()):
         
         #encode squared tile
         [tag_img,id_str,orientation] = encode_tag(square_img)
+        # cv2.imshow("Tag",tag_img)
+        # print(id_str)
+        # cv2.waitKey(0)
         
         #pick image based on id
         if id_str in tag_ids:
@@ -66,10 +75,10 @@ while(video.isOpened()):
         # new_corners=cubePoints(tag, H, P, 5)
         # frame=drawCube(tag, new_corners,frame)
 
-    # cv2.imshow("Frame",frame)
+    cv2.imshow("Frame",frame)
     # cv2.waitKey(0)
-    out.write(frame)
+    # out.write(frame)
     if cv2.waitKey(1) == ord('q'):
         break
 
-out.release()
+# out.release()
