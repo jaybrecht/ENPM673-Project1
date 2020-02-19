@@ -6,7 +6,7 @@ from cube import*
 video = cv2.VideoCapture('data/data_3.mp4') 
 
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
-fps_out = 30
+fps_out = 29
 out = cv2.VideoWriter('output.avi', fourcc, fps_out, (1920, 1080))
 
 K=np.array([[1406.08415449821,0,0],
@@ -41,11 +41,13 @@ while(video.isOpened()):
         
         #encode squared tile
         [tag_img,id_str,orientation] = encode_tag(square_img)
-        cv2.imshow("Tag",tag_img)
         
         #pick image based on id
-        index = tag_ids.index(id_str)
-        new_img = cv2.imread(img_paths[index])
+        if id_str in tag_ids:
+            index = tag_ids.index(id_str)
+            new_img = cv2.imread(img_paths[index])
+        else:
+            continue
 
         #rotate image to reflect tag orientation
         rotated_img = rotate_img(new_img,orientation)
@@ -64,9 +66,9 @@ while(video.isOpened()):
         # new_corners=cubePoints(tag, H, P, 5)
         # frame=drawCube(tag, new_corners,frame)
 
-    cv2.imshow("Frame",frame)
+    # cv2.imshow("Frame",frame)
     # cv2.waitKey(0)
-    # out.write(frame)
+    out.write(frame)
     if cv2.waitKey(1) == ord('q'):
         break
 
