@@ -1,15 +1,21 @@
 import cv2
 from functions import*
+from cube import*
 
 video = cv2.VideoCapture('data/data_3.mp4') 
 
-imgpath="Tucker.jpg"
+imgpath="data/Tucker.jpg"
 
 new_img=cv2.imread(imgpath)
 
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
 fps_out = 30
 out = cv2.VideoWriter('output.avi', fourcc, fps_out, (1920, 1080))
+
+
+K=np.array([[1406.08415449821,0,0],
+           [2.20679787308599, 1417.99930662800,0],
+           [1014.13643417416, 566.347754321696,1]])
 
 print("Writing to Video, Please Wait")
 count = 1
@@ -34,10 +40,18 @@ while(video.isOpened()):
         # cv2.imshow("Tag",tag_img)
         #rotate image to reflect tag orientation
         rotated_img = rotate_img(new_img,orientation)
-        H = homography(tag,rotated_img.shape[0])
-        H_inv = cv2.invert(H)[1]
+        # H = homography(tag,rotated_img.shape[0])
+        # H_inv = cv2.invert(H)[1]
         frame = blank_region(frame,orig_points)
-        frame = square2warp(frame,rotated_img,H_inv)
+        # frame = square2warp(frame,rotated_img,H_inv)
+
+        H=homography(tag,5)
+        P=projection_mat(K,H)
+        new_corners=cubePoints(tag, H, P, 5)
+        frame=drawCube(tag, new_corners,frame)
+
+
+
     cv2.imshow("Frame",frame)
     # cv2.waitKey(0)
     # out.write(frame)
