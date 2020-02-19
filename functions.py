@@ -142,12 +142,20 @@ def encode_tag(square_img):
         sy += k
     if encoding[5,5] == 1:
         orientation = 0
-    elif encoding[2,5] == 1:
+        center = (5*k+(k//2),5*k+(k//2))
+        cv2.circle(square_img,center,k//4,125)
+    elif encoding[5,2] == 1:
         orientation = 1
+        center = (2*k+(k//2),5*k+(k//2))
+        cv2.circle(square_img,center,k//4,125)
     elif encoding[2,2] == 1:
         orientation = 2
-    elif encoding[5,2] == 1:
+        center = (2*k+(k//2),2*k+(k//2))
+        cv2.circle(square_img,center,k//4,125)
+    elif encoding[2,5] == 1:
         orientation = 3
+        center = (5*k+(k//2),2*k+(k//2))
+        cv2.circle(square_img,center,k//4,125)
     # cv2.imshow("Tag",square_img)
     # cv2.waitKey(0)
     return [square_img,orientation]
@@ -160,6 +168,11 @@ def rotate_img(new_img,orientation):
     rotated_img = cv2.warpAffine(new_img, M, (h, w))
     return rotated_img
 
+def blank_region(frame,region):
+    for point in region:
+        frame[point[0],point[1]] = 255
+    return frame
+
 def square2warp(frame,new_img,H_inv):
     (h, w) = new_img.shape[:2]
     y,x=np.indices((h,w))
@@ -167,12 +180,9 @@ def square2warp(frame,new_img,H_inv):
     new=H_inv.dot(old)
     new/=new[2]
     for i in range(len(new[0])-1):
-        new_x = int(new[0][i])
-        new_y = int(new[1][i])
-        if new_x<0 or new_y<0:
-            pass
-        else:
-            old_x = int(old[0][i])
-            old_y = int(old[1][i])
-            frame[new_x,new_y] = new_img[old_x,old_y]  
+        x = int(new[0][i])
+        y = int(new[1][i])
+        x_ = int(old[0][i])
+        y_ = int(old[1][i])
+        frame[x,y] = new_img[x_,y_]
     return frame
