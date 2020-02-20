@@ -18,7 +18,7 @@ img_paths = ['data/Tucker.jpg','data/Hailey.jpg','data/Tessa.jpg']
 
 # print("Writing to Video, Please Wait")
 
-start_frame = 67
+start_frame = 1
 count = start_frame
 video.set(1,start_frame)
 while(video.isOpened()):
@@ -29,11 +29,11 @@ while(video.isOpened()):
     [all_cnts,cnts] = findcontours(frame,175)
     #approximate quadralateral to each contour and extract corners
     [tag_cnts,corners] = approx_quad(cnts)
-    cv2.drawContours(frame,all_cnts,-1,(0,255,0), 4)
-    cv2.drawContours(frame,tag_cnts,-1,(255,0,0), 4)
+    # cv2.drawContours(frame,all_cnts,-1,(0,255,0), 4)
+    # cv2.drawContours(frame,tag_cnts,-1,(255,0,0), 4)
     # frame_orig = frame.copy()
     # cv2.imshow("Orig Frame",frame_orig)
-    for i,tag in enumerate(corners):        
+    for i,tag in enumerate(corners):
         #find list of points in each tag
         orig_points = points_in_poly(frame,tag_cnts[i])
 
@@ -44,6 +44,8 @@ while(video.isOpened()):
         
         #get squared tile
         square_img = warp2square(orig_points,H,tag_dim)
+        # cv2.imshow("Tag",square_img)
+        # cv2.waitKey(0)
         
         #encode squared tile
         [tag_img,id_str,orientation] = encode_tag(square_img)
@@ -70,13 +72,14 @@ while(video.isOpened()):
         frame = square2warp(frame,rotated_img,H_inv)
 
         # Find new cube points and draw on image
-        # H=homography(tag,5)
-        # P=projection_mat(K,H)
-        # new_corners=cubePoints(tag, H, P, 5)
-        # frame=drawCube(tag, new_corners,frame)
+        H=homography(tag,100)
+        H_inv = np.linalg.inv(H)
+        P=projection_mat(K,H_inv)
+        new_corners=cubePoints(tag, H, P, 100)
+        frame=drawCube(tag, new_corners,frame)
 
     cv2.imshow("Frame",frame)
-    # cv2.waitKey(0)
+
     # out.write(frame)
     if cv2.waitKey(1) == ord('q'):
         break

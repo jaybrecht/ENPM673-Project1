@@ -4,22 +4,20 @@ import cv2
 def projection_mat(K,H):
 	h1=H[:,0]
 	h2=H[:,1]
-	h3=H[:,2]
 
 	K=np.transpose(K)
 
 	K_inv=np.linalg.inv(K)
 	a=np.dot(K_inv,h1)
 	c=np.dot(K_inv,h2)
-	# lamda=1/((np.linalg.norm(a)+np.linalg.norm(c))/2)
-	lamda=400
+	lamda=1/((np.linalg.norm(a)+np.linalg.norm(c))/2)
 
-	Bhat=lamda*np.dot(K_inv,H)
+	Bhat=np.dot(K_inv,H)
 
 	if np.linalg.det(Bhat)>0:
-		B=lamda*Bhat
+		B=1*Bhat
 	else:
-		B=-lamda*Bhat
+		B=-1*Bhat
 
 	b1=B[:,0]
 	b2=B[:,1]
@@ -30,7 +28,6 @@ def projection_mat(K,H):
 	t=lamda*b3
 
 	P=np.dot(K,(np.stack((r1,r2,r3,t), axis=1)))
-	#print(P)
 
 	return P
 
@@ -53,15 +50,10 @@ def cubePoints(corners, H, P, dim):
 	H_w=sH_w/sH_w[2]
 	
 	P_w=np.stack((H_w[0],H_w[1],np.full(4,-dim),np.ones(4)),axis=0)
-	# print("P_w")
-	# print(P_w)
-	# print("P")
-	# print(P)
 
 	sP_c=np.dot(P,P_w)
-	P_c=sP_c/sP_c[2]
-	print(P_c)
-	
+	P_c=sP_c/(sP_c[2])
+
 	for i in range(4):
 		new_corners.append([int(P_c[0][i]),int(P_c[1][i])])
 

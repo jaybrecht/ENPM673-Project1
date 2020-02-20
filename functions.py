@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from mySVD import mySVD
+# from mySVD import mySVD
 
 def findcontours(frame,threshold):
     imgray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -80,10 +80,10 @@ def homography(corners,dim):
             A[row,8] = yp[val]
             val += 1
 
-    U,S,V = mySVD(A)
+    U,S,V = np.linalg.svd(A)
     # x is equivalent to the eigenvector column of V that corresponds to the 
     # smallest singular value. A*x ~ 0
-    x = V[:,-1]
+    x = V[-1]
 
     # reshape x into H
     H = np.reshape(x,[3,3])
@@ -166,8 +166,8 @@ def encode_tag(square_img):
     elif encoding[2,5] == 1:
         orientation = 0
         id_str = d+a+b+c
-        # center = (5*k+(k//2),2*k+(k//2))
-        # cv2.circle(square_img,center,k//4,125)
+        center = (5*k+(k//2),2*k+(k//2))
+        cv2.circle(square_img,center,k//4,125)
 
     return [square_img,id_str,orientation]
 
