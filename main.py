@@ -6,14 +6,16 @@ import time
 
 write_to_video = True
 show_contours = False
-Dog_mode = True
+Dog_mode = False
 Cube_mode = True
-video_src = 3 # 1 for data1, 2 for data2, 3 for data3
+video_src = 2 # 1 for data1, 2 for data2, 3 for data3
+Smooth_mode = False
+Fast_mode = True
 
 if write_to_video:
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
     today = time.strftime("%m-%d__%H.%M.%S")
-    videoname=str(today)+('_contours' if show_contours == True else '')+("_dog" if Dog_mode == True else '')+('_cube' if Cube_mode == True else '')+str(video_src)
+    videoname=str(today)+('_contours' if show_contours == True else '')+("_dog" if Dog_mode == True else '')+('_cube' if Cube_mode == True else '')+('_smooth' if Smooth_mode == True else '')+str(video_src)
     fps_out = 29
     out = cv2.VideoWriter(str(videoname)+".avi", fourcc, fps_out, (1920, 1080))
     print("Writing to Video, Please Wait")
@@ -27,12 +29,13 @@ img_paths = ['data/Tucker.jpg','data/Hailey.jpg','data/Tessa.jpg']
 
 video = cv2.VideoCapture('data/data_'+str(video_src)+'.mp4') 
 
-start_frame = 600
+start_frame = 0
 count = start_frame
 video.set(1,start_frame)
 
 while(video.isOpened()):
-    print("Current frame:" + str(count))
+    if Fast_mode == False:
+        print("Current frame:" + str(count))
     count += 1
     ret, frame = video.read()
     if ret:
@@ -91,7 +94,8 @@ while(video.isOpened()):
                 edge_color = (0, 0, 0) 
                 frame=drawCube(tag, new_corners,frame,face_color,edge_color,flag)
 
-        cv2.imshow("Frame",frame)
+        if Fast_mode == False:
+            cv2.imshow("Frame",frame)
 
         if write_to_video:
             out.write(frame)
