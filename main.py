@@ -29,23 +29,20 @@ while(video.isOpened()):
     [all_cnts,cnts] = findcontours(frame,175)
     #approximate quadralateral to each contour and extract corners
     [tag_cnts,corners] = approx_quad(cnts)
-    # cv2.drawContours(frame,all_cnts,-1,(0,255,0), 4)
-    # cv2.drawContours(frame,tag_cnts,-1,(255,0,0), 4)
-    # frame_orig = frame.copy()
-    # cv2.imshow("Orig Frame",frame_orig)
-    for i,tag in enumerate(corners):
-        #find list of points in each tag
-        orig_points = points_in_poly(frame,tag_cnts[i])
+    cv2.drawContours(frame,all_cnts,-1,(0,255,0), 4)
+    cv2.drawContours(frame,tag_cnts,-1,(255,0,0), 4)
 
-        #find applicable size for squared image based on total number of points
-        tag_dim = int(math.sqrt(len(orig_points)))
+    for i,tag in enumerate(corners):
         #compute homography
-        H = homography(tag,tag_dim)
+        dim = 200
+        H = homography(tag,dim)
+        H_inv = np.linalg.inv(H)
         
         #get squared tile
-        square_img = warp2square(orig_points,H,tag_dim)
-        # cv2.imshow("Tag",square_img)
-        # cv2.waitKey(0)
+        square_img = warp(H_inv,frame,dim,dim)
+        imgray = cv2.cvtColor(square_img, cv2.COLOR_BGR2GRAY)
+        ret, square_img = cv2.threshold(imgray, 180, 255, cv2.THRESH_BINARY)
+        cv2.imshow("Tag",square_img)
         
         #encode squared tile
         [tag_img,id_str,orientation] = encode_tag(square_img)
@@ -63,13 +60,14 @@ while(video.isOpened()):
         #rotate image to reflect tag orientation
         rotated_img = rotate_img(new_img,orientation)
 
-        #blank tag area in image
-        frame = blank_region(frame,orig_points)
-
         #superimpose the image on the tag
-        H = homography(tag,rotated_img.shape[0])
-        H_inv = cv2.invert(H)[1]
-        frame = square2warp(frame,rotated_img,H_inv)
+        dim = rotated_img.shape[0]
+        H = homography(tag,dim)
+        h = frame.shape[0] 
+        w = frame.shape[1]
+        frame1 = warp(H,rotated_img,h,w)
+        frame2 = blank_region(frame,tag_cnts[i])
+        frame = cv2.bitwise_or(frame1,frame2)
 
         # Find new cube points and draw on image
         H=homography(tag,100)

@@ -45,8 +45,8 @@ def homography(corners,dim):
     x = []
     y = []
     for point in corners:
-        x.append(point[1])
-        y.append(point[0])
+        x.append(point[0])
+        y.append(point[1])
     #ccw corners
     xp=[0,dim,dim,0]
     yp=[0,0,dim,dim]
@@ -89,40 +89,20 @@ def homography(corners,dim):
     H = np.reshape(x,[3,3])
     return H
 
-def points_in_poly(frame,contour):
-    H = frame.shape[0]
-    L = frame.shape[1]
-    matrix =np.zeros((H,L),dtype=np.int32)
-    cv2.drawContours(matrix,[contour],-1,(1),thickness=-1)
-    inds=np.nonzero(matrix)
-    points = []
-    for i in range(len(inds[0])):
-        x = inds[0][i]
-        y = inds[1][i]
-        points.append([x,y,frame[x][y]])
-    return points
+def warp(H,src,h,w):
+    # create indices of the destination image and linearize them
+    indy, indx = np.indices((h, w), dtype=np.float32)
+    lin_homg_ind = np.array([indx.ravel(), indy.ravel(), np.ones_like(indx).ravel()])
 
-def warp2square(orig_points,H,dim):
-    new_points = []
-    x = []
-    y = []
-    for point in orig_points:
-        x.append(point[0])
-        y.append(point[1])
-    old_points = np.stack((np.array(x),np.array(y),np.ones(len(x))))
-    new_points=H.dot(old_points)
-    new_points/=new_points[2]
-    square_img =np.full((dim,dim,3),255//2,dtype="uint8")
-    for i in range(len(new_points[0])-1):
-        new_x = int(new_points[0][i])
-        new_y = int(new_points[1][i])
-        if new_x<0 or new_y<0 or new_x>=dim or new_y>=dim:
-            pass
-        else:
-            square_img[new_y][new_x] = orig_points[i][2]
-    imgray = cv2.cvtColor(square_img, cv2.COLOR_BGR2GRAY)
-    ret, square_img = cv2.threshold(imgray, 200, 255, cv2.THRESH_BINARY)
-    return square_img
+    # warp the coordinates of src to those of true_dst
+    map_ind = H.dot(lin_homg_ind)
+    map_x, map_y = map_ind[:-1]/map_ind[-1]  # ensure homogeneity
+    map_x = map_x.reshape(h, w).astype(np.float32)
+    map_y = map_y.reshape(h, w).astype(np.float32)
+
+    new_img = cv2.remap(src, map_x, map_y, cv2.INTER_LINEAR)
+    
+    return new_img
 
 def encode_tag(square_img):
     dim = square_img.shape[0]
@@ -143,57 +123,49 @@ def encode_tag(square_img):
     # Id is contained in the inner four elements of the tag
     # a  b
     # d  c
-
     a = str(int(encoding[3][3]))
     b = str(int(encoding[3][4]))
     c = str(int(encoding[4][4]))
     d = str(int(encoding[4][3]))
+
     if encoding[5,5] == 1:
-        orientation = 1
-        id_str = a+b+c+d
-        # center = (5*k+(k//2),5*k+(k//2))
-        # cv2.circle(square_img,center,k//4,125)
-    elif encoding[5,2] == 1:
-        orientation = 2
-        id_str = b+c+d+a
-        # center = (2*k+(k//2),5*k+(k//2))
-        # cv2.circle(square_img,center,k//4,125)
-    elif encoding[2,2] == 1:
         orientation = 3
-        id_str = c+d+a+b
-        # center = (2*k+(k//2),2*k+(k//2))
-        # cv2.circle(square_img,center,k//4,125)
+        id_str = a+b+c+d
+        center = (5*k+(k//2),5*k+(k//2))
+        cv2.circle(square_img,center,k//4,125)
     elif encoding[2,5] == 1:
-        orientation = 0
+        orientation = 2
         id_str = d+a+b+c
         center = (5*k+(k//2),2*k+(k//2))
         cv2.circle(square_img,center,k//4,125)
+    elif encoding[2,2] == 1:
+        orientation = 1
+        id_str = c+d+a+b
+        center = (2*k+(k//2),2*k+(k//2))
+        cv2.circle(square_img,center,k//4,125)
+    elif encoding[5,2] == 1:
+        orientation = 0
+        id_str = b+c+d+a
+        center = (2*k+(k//2),5*k+(k//2))
+        cv2.circle(square_img,center,k//4,125)
+    else:
+        orientation = 0
+        id_str = '0000'
 
     return [square_img,id_str,orientation]
 
-def rotate_img(new_img,orientation):
-    (h, w) = new_img.shape[:2]
-    center = (w/2, h/2)
-    angle = orientation*90
-    M = cv2.getRotationMatrix2D(center, angle, 1)
-    rotated_img = cv2.warpAffine(new_img, M, (h, w))
+def rotate_img(img,orientation):
+    if orientation == 1:
+        rotated_img = cv2.rotate(img,cv2.ROTATE_90_CLOCKWISE)
+    elif orientation == 2:
+        rotated_img = cv2.rotate(img,cv2.ROTATE_180)
+    elif orientation == 3:
+        rotated_img = cv2.rotate(img,cv2.ROTATE_90_COUNTERCLOCKWISE)
+    else:
+        rotated_img = img
+
     return rotated_img
 
-def blank_region(frame,region):
-    for point in region:
-        frame[point[0],point[1]] = 255
-    return frame
-
-def square2warp(frame,new_img,H_inv):
-    (h, w) = new_img.shape[:2]
-    y,x=np.indices((h,w))
-    old=np.stack((x.ravel(),y.ravel(),np.ones(y.size)))
-    new=H_inv.dot(old)
-    new/=new[2]
-    for i in range(len(new[0])-1):
-        x = int(new[0][i])
-        y = int(new[1][i])
-        x_ = int(old[0][i])
-        y_ = int(old[1][i])
-        frame[x,y] = new_img[x_,y_]
+def blank_region(frame,contour):
+    cv2.drawContours(frame,[contour],-1,(0),thickness=-1)
     return frame
