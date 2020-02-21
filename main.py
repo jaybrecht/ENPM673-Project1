@@ -2,12 +2,14 @@ import cv2
 import math
 from functions import*
 from cube import*
+import time
 
 video = cv2.VideoCapture('data/data_3.mp4') 
 
 # fourcc = cv2.VideoWriter_fourcc(*'XVID')
+# today = time.strftime("%Y%m%d-%H%M%S")
 # fps_out = 29
-# out = cv2.VideoWriter('output.avi', fourcc, fps_out, (1920, 1080))
+# out = cv2.VideoWriter(str(today)+".avi", fourcc, fps_out, (1920, 1080))
 
 K=np.array([[1406.08415449821,0,0],
            [2.20679787308599, 1417.99930662800,0],
