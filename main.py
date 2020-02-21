@@ -10,7 +10,7 @@ Dog_mode = False
 Cube_mode = True
 video_src = 2 # 1 for data1, 2 for data2, 3 for data3
 Smooth_mode = False
-Fast_mode = True
+Fast_mode = True # Wont show the frame to screen. Best for write_to_video=True
 
 if write_to_video:
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
