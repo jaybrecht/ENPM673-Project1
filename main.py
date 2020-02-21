@@ -4,17 +4,18 @@ from functions import*
 from cube import*
 import time
 
-write_to_video = False
+write_to_video = True
 show_contours = False
-Dog_mode = False
+Dog_mode = True
 Cube_mode = True
-video_src = 1 # 1 for data1, 2 for data2, 3 for data3
+video_src = 3 # 1 for data1, 2 for data2, 3 for data3
 
 if write_to_video:
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    today = time.strftime("%Y%m%d-%H%M%S")
+    today = time.strftime("%m-%d__%H.%M.%S")
+    videoname=str(today)+('_contours' if show_contours == True else '')+("_dog" if Dog_mode == True else '')+('_cube' if Cube_mode == True else '')+str(video_src)
     fps_out = 29
-    out = cv2.VideoWriter(str(today)+".avi", fourcc, fps_out, (1920, 1080))
+    out = cv2.VideoWriter(str(videoname)+".avi", fourcc, fps_out, (1920, 1080))
     print("Writing to Video, Please Wait")
 
 K=np.array([[1406.08415449821,0,0],
