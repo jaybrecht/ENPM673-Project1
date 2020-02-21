@@ -166,6 +166,6 @@ def rotate_img(img,orientation):
 
     return rotated_img
 
-def blank_region(frame,contour):
-    cv2.drawContours(frame,[contour],-1,(0),thickness=-1)
+def blank_region(frame,contour,color):
+    cv2.drawContours(frame,[contour],-1,(color),thickness=-1)
     return frame

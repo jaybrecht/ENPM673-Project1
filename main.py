@@ -3,7 +3,7 @@ import math
 from functions import*
 from cube import*
 
-video = cv2.VideoCapture('data/data_3.mp4') 
+video = cv2.VideoCapture('data/data_2.mp4') 
 
 # fourcc = cv2.VideoWriter_fourcc(*'XVID')
 # fps_out = 29
@@ -18,6 +18,10 @@ img_paths = ['data/Tucker.jpg','data/Hailey.jpg','data/Tessa.jpg']
 
 # print("Writing to Video, Please Wait")
 
+show_contours = False
+Dog_mode = True
+Cube_mode = True
+
 start_frame = 1
 count = start_frame
 video.set(1,start_frame)
@@ -26,11 +30,14 @@ while(video.isOpened()):
     count += 1
     ret, frame = video.read()
     #find correct contours
-    [all_cnts,cnts] = findcontours(frame,175)
+    [all_cnts,cnts] = findcontours(frame,180)
     #approximate quadralateral to each contour and extract corners
     [tag_cnts,corners] = approx_quad(cnts)
-    cv2.drawContours(frame,all_cnts,-1,(0,255,0), 4)
-    cv2.drawContours(frame,tag_cnts,-1,(255,0,0), 4)
+    if show_contours == True:
+        cv2.drawContours(frame,all_cnts,-1,(0,255,0), 4)
+        cv2.drawContours(frame,tag_cnts,-1,(255,0,0), 4)
+
+    flag = False
 
     for i,tag in enumerate(corners):
         #compute homography
@@ -42,13 +49,9 @@ while(video.isOpened()):
         square_img = warp(H_inv,frame,dim,dim)
         imgray = cv2.cvtColor(square_img, cv2.COLOR_BGR2GRAY)
         ret, square_img = cv2.threshold(imgray, 180, 255, cv2.THRESH_BINARY)
-        cv2.imshow("Tag",square_img)
         
         #encode squared tile
         [tag_img,id_str,orientation] = encode_tag(square_img)
-        # cv2.imshow("Tag",tag_img)
-        # print(id_str)
-        # cv2.waitKey(0)
         
         #pick image based on id
         if id_str in tag_ids:
@@ -60,21 +63,26 @@ while(video.isOpened()):
         #rotate image to reflect tag orientation
         rotated_img = rotate_img(new_img,orientation)
 
-        #superimpose the image on the tag
-        dim = rotated_img.shape[0]
-        H = homography(tag,dim)
-        h = frame.shape[0] 
-        w = frame.shape[1]
-        frame1 = warp(H,rotated_img,h,w)
-        frame2 = blank_region(frame,tag_cnts[i])
-        frame = cv2.bitwise_or(frame1,frame2)
+        if Dog_mode:
+            #superimpose the image on the tag
+            dim = rotated_img.shape[0]
+            H = homography(tag,dim)
+            h = frame.shape[0] 
+            w = frame.shape[1]
+            frame1 = warp(H,rotated_img,h,w)
+            frame2 = blank_region(frame,tag_cnts[i],0)
+            frame = cv2.bitwise_or(frame1,frame2)
+            flag = True
 
+        if Cube_mode:
         # Find new cube points and draw on image
-        H=homography(tag,100)
-        H_inv = np.linalg.inv(H)
-        P=projection_mat(K,H_inv)
-        new_corners=cubePoints(tag, H, P, 100)
-        frame=drawCube(tag, new_corners,frame)
+            H=homography(tag,200)
+            H_inv = np.linalg.inv(H)
+            P=projection_mat(K,H_inv)
+            new_corners=cubePoints(tag, H, P, 200)
+            face_color = (100, 100, 100) 
+            edge_color = (0, 0, 0) 
+            frame=drawCube(tag, new_corners,frame,face_color,edge_color,flag)
 
     cv2.imshow("Frame",frame)
 

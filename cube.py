@@ -60,26 +60,44 @@ def cubePoints(corners, H, P, dim):
 	return new_corners
 
 
-def drawCube(tagcorners, new_corners,frame):
-	color=(0, 0, 255) 
-	thickness=2
+def drawCube(tagcorners, new_corners,frame,face_color,edge_color,flag):
+	thickness=5
+	if not flag:
+		contours = makeContours(tagcorners,new_corners)
+		for contour in contours:
+			cv2.drawContours(frame,[contour],-1,face_color,thickness=-1)
+
 	for i, point in enumerate(tagcorners):
-		cv2.line(frame, tuple(point), tuple(new_corners[i]), color, thickness) 
+		cv2.line(frame, tuple(point), tuple(new_corners[i]), edge_color, thickness) 
 
 	for i in range (4):
 		if i==3:
-			cv2.line(frame,tuple(tagcorners[i]),tuple(tagcorners[0]),color,thickness)
-			cv2.line(frame,tuple(new_corners[i]),tuple(new_corners[0]),color,thickness)
+			cv2.line(frame,tuple(tagcorners[i]),tuple(tagcorners[0]),edge_color,thickness)
+			cv2.line(frame,tuple(new_corners[i]),tuple(new_corners[0]),edge_color,thickness)
 		else:
-			cv2.line(frame,tuple(tagcorners[i]),tuple(tagcorners[i+1]),color,thickness)
-			cv2.line(frame,tuple(new_corners[i]),tuple(new_corners[i+1]),color,thickness)
+			cv2.line(frame,tuple(tagcorners[i]),tuple(tagcorners[i+1]),edge_color,thickness)
+			cv2.line(frame,tuple(new_corners[i]),tuple(new_corners[i+1]),edge_color,thickness)
 
 	return frame
 
-#H=np.array([[1,2,3],[4,5,6],[7,8,9]])
+
+def makeContours(corners1,corners2):
+	contours = []
+	for i in range(len(corners1)):
+		if i==3:
+			p1 = corners1[i]
+			p2 = corners1[0]
+			p3 = corners2[0]
+			p4 = corners2[i]
+		else:
+			p1 = corners1[i]
+			p2 = corners1[i+1]
+			p3 = corners2[i+1]
+			p4 = corners2[i]
+		contours.append(np.array([p1,p2,p3,p4], dtype=np.int32))
+	contours.append(np.array([corners1[0],corners1[1],corners1[2],corners1[3]], dtype=np.int32))
+	contours.append(np.array([corners2[0],corners2[1],corners2[2],corners2[3]], dtype=np.int32))
+
+	return contours
 
 
-# P=projection_mat(K,H)
-
-
-# print(P)
