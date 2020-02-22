@@ -2,6 +2,10 @@
 
 This project tracks up to 3 AR tags in a video. The program has several modes, all accessible via a series of Boolean toggles at the top of `main.py`.
 
+
+![tag1](https://github.com/jaybrecht/ENPM673-Project1/blob/master/images/tag1.png)
+
+
 ## Write_to_video
 This mode, when set `True`, saves the output of the video to an AVI file. The video will save in the same directory as `main.py`. The name of the video is determined by the modes you have enabled, so that the output video filename is a clear log of the configuration it recorded. If you only want to export a video (to watch later) we recommend toggling `Fast_mode` to `True`. This disables previewing the frames on screen, and offers some performance increases. `Fast_mode` is not recommended in conjunction with any other mode. 
 
