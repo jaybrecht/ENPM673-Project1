@@ -4,13 +4,17 @@ from functions import*
 from cube import*
 import time
 
-write_to_video = True
-show_contours = False
+write_to_video = False
+show_contours = True
 Dog_mode = False
 Cube_mode = True
-video_src = 2 # 1 for data1, 2 for data2, 3 for data3
+video_src = 3 # 1 for data1, 2 for data2, 3 for data3
 Smooth_mode = False
-Fast_mode = True # Wont show the frame to screen. Best for write_to_video=True
+Fast_mode = False # Wont show the frame to screen. Best for write_to_video=True
+
+# Cube settings
+face_color = (100, 100, 100) 
+edge_color = (0, 0, 0) 
 
 if write_to_video:
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
@@ -90,8 +94,6 @@ while(video.isOpened()):
                 H_inv = np.linalg.inv(H)
                 P=projection_mat(K,H_inv)
                 new_corners=cubePoints(tag, H, P, 200)
-                face_color = (100, 100, 100) 
-                edge_color = (0, 0, 0) 
                 frame=drawCube(tag, new_corners,frame,face_color,edge_color,flag)
 
         if Fast_mode == False:
