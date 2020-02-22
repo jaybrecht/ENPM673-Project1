@@ -1,11 +1,12 @@
 # ENPM673-Project1
 
-This project tracks up to 3 AR tags in a video. 
+This project tracks up to 3 AR tags in a video. Examples of the 3 tags (after processing) can be seen below.
 
 
 ![tag1](https://github.com/jaybrecht/ENPM673-Project1/blob/master/images/tag1.png) ![tag2](https://github.com/jaybrecht/ENPM673-Project1/blob/master/images/tag2.png) ![tag3](https://github.com/jaybrecht/ENPM673-Project1/blob/master/images/tag3.png) 
 
 
+# Program Modes
 The program has several modes, all accessible via a series of Boolean toggles at the top of `main.py`.
 
 ## Write_to_video
@@ -16,6 +17,7 @@ You have the option to enable the display of the contours found in the frame. Gr
 
 ## Dog_mode
 Dog_mode, when toggled `True`, takes our 3 dog images and superposes them on their respective tags. 
+![dog_mode](https://github.com/jaybrecht/ENPM673-Project1/blob/master/images/dog_mode.jpeg)
 
 ## Cube_mode
 Cube_mode displays a cube on each tag. You can run `Dog_mode` and `Cube_mode` at the same time. If you do, the cubes will render transparent so that the dogs can be seen on the bottom face. If you run just `Cube_mode`, the cubes will render with grey faces. 
@@ -34,5 +36,7 @@ This allows you to change which of the three available videos are used in the pr
 
 You can use any of these three videos with any combination of other modes. 
 
+
+# How It Works
 
 
