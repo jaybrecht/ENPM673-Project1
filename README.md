@@ -16,7 +16,11 @@ Cube_mode displays a cube on each tag. You can run `Dog_mode` and `Cube_mode` at
 
 ## video_src
 This allows you to change which of the three available videos are used in the program. 
+
 `video_src = 1` is the first video (data_1.mp4), which has 1 AR tag. 
+
 `video_src = 2` is the second video (data_2.mp4), which has 2 AR tags. 
+
 `video_src = 3` is the third video (data_3.mp4), which has 3 AR tags.
+
 You can use any of these three videos with any combination of other modes. 
