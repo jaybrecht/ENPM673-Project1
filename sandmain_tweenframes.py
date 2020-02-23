@@ -10,27 +10,13 @@ show_contours = True
 Dog_mode = False
 Cube_mode = True
 video_src = 3 # 1 for data1, 2 for data2, 3 for data3
-Smooth_mode = False
-Fast_mode = False # Wont show the frame to screen. Best for write_to_video=True
+Smooth_mode = True
+Fast_mode = True # Wont show the frame to screen. Best for write_to_video=True
 
 # Cube settings
 face_color = (100, 100, 100) 
 edge_color = (0, 0, 0) 
 
-if write_to_video:
-    fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    today = time.strftime("%m-%d__%H.%M.%S")
-    videoname=str(today)+('_contours' if show_contours == True else '')+("_dog" if Dog_mode == True else '')+('_cube' if Cube_mode == True else '')+('_smooth' if Smooth_mode == True else '')+str(video_src)
-    fps_out = 29
-    out = cv2.VideoWriter(str(videoname)+".avi", fourcc, fps_out, (1920, 1080))
-    print("Writing to Video, Please Wait")
-
-K=np.array([[1406.08415449821,0,0],
-           [2.20679787308599, 1417.99930662800,0],
-           [1014.13643417416, 566.347754321696,1]])
-
-tag_ids = ['0101','0111','1111']
-img_paths = ['data/Tucker.jpg','data/Hailey.jpg','data/Tessa.jpg']
 
 video = cv2.VideoCapture('data/data_'+str(video_src)+'.mp4') 
 
@@ -52,12 +38,29 @@ while(video.isOpened()):
         print("Finished reading in video")
         break
 
-new_frame_array=halfFrames(frame_array)
-new_frame_array=halfFrames(new_frame_array)
-new_frame_array=halfFrames(new_frame_array)
+
+if write_to_video:
+    fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    today = time.strftime("%m-%d__%H.%M.%S")
+    videoname=str(today)+('_contours' if show_contours == True else '')+("_dog" if Dog_mode == True else '')+('_cube' if Cube_mode == True else '')+('_smooth' if Smooth_mode == True else '')+str(video_src)
+    fps_out = 29
+    out = cv2.VideoWriter(str(videoname)+".avi", fourcc, fps_out, (1920, 1080))
+    print("Writing to Video, Please Wait")
+
+K=np.array([[1406.08415449821,0,0],
+           [2.20679787308599, 1417.99930662800,0],
+           [1014.13643417416, 566.347754321696,1]])
+
+tag_ids = ['0101','0111','1111']
+img_paths = ['data/Tucker.jpg','data/Hailey.jpg','data/Tessa.jpg']
 
 
-for frame in new_frame_array:  
+
+if Smooth_mode==True:
+    frame_array=halfFrames(frame_array)
+#new_frame_array=halfFrames(new_frame_array)
+
+for frame in frame_array:  
         #find correct contours
         [all_cnts,cnts] = findcontours(frame,180)
         #approximate quadralateral to each contour and extract corners
