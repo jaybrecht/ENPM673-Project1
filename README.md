@@ -22,6 +22,8 @@ Dog_mode, when toggled `True`, takes our 3 dog images and superposes them on the
 ## Cube_mode
 Cube_mode displays a cube on each tag. You can run `Dog_mode` and `Cube_mode` at the same time. If you do, the cubes will render transparent so that the dogs can be seen on the bottom face. If you run just `Cube_mode`, the cubes will render with grey faces. 
 
+![cube_mode](https://github.com/jaybrecht/ENPM673-Project1/blob/master/images/cube_mode.png)
+
 You can change the color of the cube faces by editing `face_color` near the top of `main.py`. The colors are in (B,G,R) from 0-255. Similarly, you can edit the color of the cube edges by changing `edge_color` near the top of `main.py`.
 
 
