@@ -1,6 +1,6 @@
 # ENPM673-Project1
 
-This project tracks up to 3 AR tags in a video. Examples of the 3 tags (after processing) can be seen below.
+This project tracks up to 3 AR tags in a video. Examples of the 3 tags (after processing) can be seen below. These tags are divided into an 8x8 grid for orientation analysis and identification. 
 
 
 ![tag1](https://github.com/jaybrecht/ENPM673-Project1/blob/master/images/tag1.png) ![tag2](https://github.com/jaybrecht/ENPM673-Project1/blob/master/images/tag2.png) ![tag3](https://github.com/jaybrecht/ENPM673-Project1/blob/master/images/tag3.png) 
