@@ -14,6 +14,7 @@ This mode, when set `True`, saves the output of the video to an AVI file. The vi
 
 ## show_contours
 You have the option to enable the display of the contours found in the frame. Green contours denote the outer edge of the paper. The blue contours denote the edge of the AR tag. This mode can be enabled alongside any other mode. 
+![contours](https://github.com/jaybrecht/ENPM673-Project1/blob/master/images/contours.png)
 
 ## Dog_mode
 Dog_mode, when toggled `True`, takes our 3 dog images and superposes them on their respective tags. 
