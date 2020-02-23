@@ -10,12 +10,14 @@ show_contours = True
 Dog_mode = False
 Cube_mode = True
 video_src = 3 # 1 for data1, 2 for data2, 3 for data3
-Smooth_mode = True
+Smooth_mode = False
 Fast_mode = True # Wont show the frame to screen. Best for write_to_video=True
 
 # Cube settings
 face_color = (100, 100, 100) 
-edge_color = (0, 0, 0) 
+edge_color = (0, 0, 0)
+
+stepsize=3 
 
 
 video = cv2.VideoCapture('data/data_'+str(video_src)+'.mp4') 
@@ -25,6 +27,11 @@ count = start_frame
 video.set(1,start_frame)
 frame_array=[]
 
+kernel_sharpening = np.array([[-1,-1,-1], 
+                              [-1, 9,-1],
+                              [-1,-1,-1]])
+
+print("Reading video into memory...")
 while(video.isOpened()):
     #if Fast_mode == False:
         #print("Current frame:" + str(count))
@@ -32,6 +39,7 @@ while(video.isOpened()):
     ret, frame = video.read()
     if ret:
         #next_frame=video.read(video.set(1,count+1))[1]
+        #frame_array.append(cv2.filter2D(frame, -1, kernel_sharpening))
         frame_array.append(frame)
 
     else:
@@ -45,7 +53,7 @@ if write_to_video:
     videoname=str(today)+('_contours' if show_contours == True else '')+("_dog" if Dog_mode == True else '')+('_cube' if Cube_mode == True else '')+('_smooth' if Smooth_mode == True else '')+str(video_src)
     fps_out = 29
     out = cv2.VideoWriter(str(videoname)+".avi", fourcc, fps_out, (1920, 1080))
-    print("Writing to Video, Please Wait")
+    print("Writing to output video, Please Wait")
 
 K=np.array([[1406.08415449821,0,0],
            [2.20679787308599, 1417.99930662800,0],
@@ -60,11 +68,37 @@ if Smooth_mode==True:
     frame_array=halfFrames(frame_array)
 #new_frame_array=halfFrames(new_frame_array)
 
-for frame in frame_array:  
+avgcorners=[]
+for g,frame in enumerate(frame_array):  
         #find correct contours
         [all_cnts,cnts] = findcontours(frame,180)
+        [all_cnts2,cnts2] = findcontours(frame_array[g+1],180)
+
         #approximate quadralateral to each contour and extract corners
         [tag_cnts,corners] = approx_quad(cnts)
+        [tag_cnts2,corners2] = approx_quad(cnts2)
+        
+        if len(corners)==3 and len(corners2)==3:
+            print("averaging")
+            sumcorners=np.add(corners,corners2)
+            avgcorners=np.divide(sumcorners,2)
+            corners=avgcorners.astype(int)
+        else:
+            print("insufficient tags")
+        # #print(len(corners))
+        # if len(corners)==3:
+        #     avgcorners.append(corners)
+
+        # if len(avgcorners)==2:
+        #     sumavgcnts=np.add(avgcorners[0],avgcorners[1])
+        #     newavgcnts=np.divide(sumavgcnts,2)
+        #     corners=newavgcnts.astype(int)
+        #     avgcorners=[]
+
+
+
+
+
         if show_contours == True:
             cv2.drawContours(frame,all_cnts,-1,(0,255,0), 4)
             cv2.drawContours(frame,tag_cnts,-1,(255,0,0), 4)

@@ -1,9 +1,12 @@
 import cv2
+import numpy as np
+
 # from PIL import Image 
 def halfFrames(frame_array):
 	# Take in frame_array (effectively a video)
 	new_frame_array=[]
 	print("Time to make some half frames. This will take a moment")
+
 	for i in range(0,len(frame_array)-300):
 		# add the frame to the new array
 		new_frame_array.append(frame_array[i])
@@ -14,6 +17,7 @@ def halfFrames(frame_array):
 			b=1-a
 			#print(b,a)
 			half_frame = cv2.addWeighted(frame_array[i], b, frame_array[i+1], a, 0) 
+			#sharpened=cv2.filter2D(half_frame, -1, kernel_sharpening)
 
 			# add the half frame to the array
 			new_frame_array.append(half_frame)
