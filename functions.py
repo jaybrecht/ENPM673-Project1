@@ -227,6 +227,7 @@ def getCorners(frame):
 
 
 def avgCorners(p2, p1, current, f1, f2):
+    diff = 30
     average_corners={}
     for tag in current:
         templist=[current[tag]]
@@ -263,7 +264,20 @@ def avgCorners(p2, p1, current, f1, f2):
         newcorners=np.divide(newcorners,len(templist))
         newcorners=newcorners.astype(int)
         newcorners=np.ndarray.tolist(newcorners)
-        average_corners[tag] = newcorners
+
+        # If any coner value is > n pixels from original keep original
+        teleport = False
+        for i in range(4):
+            orig_x = current[tag][i][0]
+            orig_y = current[tag][i][1]
+            new_x = newcorners[i][0]
+            new_y = newcorners[i][1]
+            if (abs(orig_x-new_x) > diff) or (abs(orig_y-new_y) > diff):
+                teleport = True
+        if teleport:
+            average_corners[tag] = current[tag] 
+        else:
+            average_corners[tag] = newcorners
         
     return average_corners
         

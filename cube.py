@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+from functions import*
 
 def projection_mat(K,H):
 	h1=H[:,0]
@@ -101,3 +102,17 @@ def makeContours(corners1,corners2):
 	return contours
 
 
+def getTopCorners(bot_corners):
+	K = np.array([[1406.08415449821,0,0],
+			[2.20679787308599, 1417.99930662800,0],
+ 			[1014.13643417416, 566.347754321696,1]])
+
+	top_corners = {}
+
+	for tag_id, corners in bot_corners.items():
+		H = homography(corners,200)
+		H_inv = np.linalg.inv(H)
+		P = projection_mat(K,H_inv)
+		top_corners[tag_id] = cubePoints(corners, H, P, 200)
+
+	return top_corners
