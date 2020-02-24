@@ -169,3 +169,111 @@ def rotate_img(img,orientation):
 def blank_region(frame,contour,color):
     cv2.drawContours(frame,[contour],-1,(color),thickness=-1)
     return frame
+
+
+
+def getCorners(frame):
+    [all_cnts,cnts] = findcontours(frame,180)
+    #approximate quadralateral to each contour and extract corners
+    [tag_cnts,corners] = approx_quad(cnts)
+
+    tag_corners={}
+
+    for i,tag in enumerate(corners):
+        #compute homography
+        dim = 200
+        H = homography(tag,dim)
+        H_inv = np.linalg.inv(H)
+        
+        #get squared tile
+        square_img = warp(H_inv,frame,dim,dim)
+        imgray = cv2.cvtColor(square_img, cv2.COLOR_BGR2GRAY)
+        ret, square_img = cv2.threshold(imgray, 180, 255, cv2.THRESH_BINARY)
+        
+        #encode squared tile
+        [tag_img,id_str,orientation] = encode_tag(square_img)
+
+        ordered_corners=[]
+        # print("tag:")
+        # print(tag)
+        # print("tag[1]:")
+        # print(tag[1])
+
+        if orientation==0:
+            ordered_corners=tag
+
+        elif orientation==1:
+            ordered_corners.append(tag[1])
+            ordered_corners.append(tag[2])
+            ordered_corners.append(tag[3])
+            ordered_corners.append(tag[0])
+
+        elif orientation==2:
+            ordered_corners.append(tag[2])
+            ordered_corners.append(tag[3])
+            ordered_corners.append(tag[0])
+            ordered_corners.append(tag[1])
+
+        elif orientation==3:
+            ordered_corners.append(tag[3])
+            ordered_corners.append(tag[0])
+            ordered_corners.append(tag[1])
+            ordered_corners.append(tag[2])
+        
+        tag_corners[id_str] = ordered_corners
+        
+
+    return tag_corners
+
+
+def avgCorners(p2, p1, current, f1, f2):
+    average_corners={}
+    for tag in current:
+        templist=[current[tag]]
+        if tag in p1:
+            templist.append(p1[tag])
+        elif tag in p2:
+            templist.append(p2[tag])
+        if tag in f1:
+            templist.append(f1[tag])
+        elif tag in f2:
+            templist.append(f2[tag])
+        
+        newcorners=[]
+        c1x=0
+        c1y=0
+        c2x=0
+        c2y=0
+        c3x=0
+        c3y=0
+        c4x=0
+        c4y=0
+        for allcorners in templist:
+            c1x+=allcorners[0][0]
+            c1y+=allcorners[0][1]
+            c2x+=allcorners[1][0]
+            c2y+=allcorners[1][1]
+            c3x+=allcorners[2][0]
+            c3y+=allcorners[2][1]
+            c4x+=allcorners[3][0]
+            c4y+=allcorners[3][1]
+
+
+        newcorners=np.array([[c1x,c1y],[c2x,c2y],[c3x,c3y],[c4x,c4y]])
+        newcorners=np.divide(newcorners,len(templist))
+        newcorners=newcorners.astype(int)
+        newcorners=np.ndarray.tolist(newcorners)
+        average_corners[tag] = newcorners
+        
+    return average_corners
+        
+
+
+
+
+
+
+
+
+
+
