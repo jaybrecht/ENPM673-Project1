@@ -5,12 +5,13 @@ from cube import*
 import time
 
 write_to_video = False
-show_contours = True
-Dog_mode = False
-Cube_mode = True
+show_contours = False
+Dog_mode = True
+Cube_mode = False
 video_src = 3 # 1 for data1, 2 for data2, 3 for data3
 Smooth_mode = False
 Fast_mode = False # Wont show the frame to screen. Best for write_to_video=True
+Fast_warp = False
 
 # Cube settings
 face_color = (100, 100, 100) 
@@ -31,6 +32,10 @@ K=np.array([[1406.08415449821,0,0],
 tag_ids = ['0101','0111','1111']
 img_paths = ['data/Tucker.jpg','data/Hailey.jpg','data/Tessa.jpg']
 
+imgs = []
+for path in img_paths:
+    imgs.append(cv2.imread(path))
+
 video = cv2.VideoCapture('data/data_'+str(video_src)+'.mp4') 
 
 start_frame = 0
@@ -38,7 +43,7 @@ count = start_frame
 video.set(1,start_frame)
 
 while(video.isOpened()):
-    if Fast_mode == False:
+    if not Fast_mode:
         print("Current frame:" + str(count))
     count += 1
     ret, frame = video.read()
@@ -58,32 +63,40 @@ while(video.isOpened()):
             dim = 200
             H = homography(tag,dim)
             H_inv = np.linalg.inv(H)
-            
+
             #get squared tile
-            square_img = warp(H_inv,frame,dim,dim)
+            if Fast_warp:
+                square_img = fastwarp(H_inv,frame,dim,dim)
+            else:
+                square_img = warp(H_inv,frame,dim,dim)
             imgray = cv2.cvtColor(square_img, cv2.COLOR_BGR2GRAY)
             ret, square_img = cv2.threshold(imgray, 180, 255, cv2.THRESH_BINARY)
-            
+
             #encode squared tile
             [tag_img,id_str,orientation] = encode_tag(square_img)
-            
-            #pick image based on id
-            if id_str in tag_ids:
-                index = tag_ids.index(id_str)
-                new_img = cv2.imread(img_paths[index])
-            else:
-                continue
-
-            #rotate image to reflect tag orientation
-            rotated_img = rotate_img(new_img,orientation)
-
+            # cv2.imshow("Tag",tag_img)
+            # cv2.waitKey(0)
+        
             if Dog_mode:
+                 #pick image based on id
+                if id_str in tag_ids:
+                    index = tag_ids.index(id_str)
+                    new_img = imgs[index]
+                else:
+                    continue
+
+                #rotate image to reflect tag orientation
+                rotated_img = rotate_img(new_img,orientation)
+
                 #superimpose the image on the tag
                 dim = rotated_img.shape[0]
                 H = homography(tag,dim)
                 h = frame.shape[0] 
                 w = frame.shape[1]
-                frame1 = warp(H,rotated_img,h,w)
+                if Fast_warp:
+                    frame1 = fastwarp(H,rotated_img,h,w)
+                else:
+                    frame1 = warp(H,rotated_img,h,w)
                 frame2 = blank_region(frame,tag_cnts[i],0)
                 frame = cv2.bitwise_or(frame1,frame2)
                 flag = True
@@ -96,14 +109,15 @@ while(video.isOpened()):
                 new_corners=cubePoints(tag, H, P, 200)
                 frame=drawCube(tag, new_corners,frame,face_color,edge_color,flag)
 
-        if Fast_mode == False:
+        if not Fast_mode:
             cv2.imshow("Frame",frame)
 
         if write_to_video:
             out.write(frame)
-        if cv2.waitKey(1) == ord('q'):
-            break
     else:
+        break
+
+    if cv2.waitKey(1) == ord('q'):
         break
 
 if write_to_video:

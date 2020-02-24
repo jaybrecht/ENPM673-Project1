@@ -89,6 +89,7 @@ def homography(corners,dim):
     H = np.reshape(x,[3,3])
     return H
 
+
 def warp(H,src,h,w):
     # create indices of the destination image and linearize them
     indy, indx = np.indices((h, w), dtype=np.float32)
@@ -96,9 +97,42 @@ def warp(H,src,h,w):
 
     # warp the coordinates of src to those of true_dst
     map_ind = H.dot(lin_homg_ind)
-    map_x, map_y = map_ind[:-1]/map_ind[-1]  # ensure homogeneity
-    map_x = map_x.reshape(h, w).astype(np.float32)
-    map_y = map_y.reshape(h, w).astype(np.float32)
+    map_x, map_y = map_ind[:-1]/map_ind[-1] 
+    map_x = map_x.reshape(h,w).astype(np.float32)
+    map_y = map_y.reshape(h,w).astype(np.float32)
+
+    # generate new image
+    new_img = np.zeros((h,w,3),dtype="uint8")
+
+    map_x[map_x>=src.shape[1]] = -1
+    map_x[map_x<0] = -1
+    map_y[map_y>=src.shape[0]] = -1
+    map_x[map_y<0] = -1
+
+
+
+    for i in range(w):
+        for j in range(h):
+            x = int(map_x[j,i])
+            y = int(map_y[j,i])
+
+            if x == -1 or y == -1:
+                pass
+            else:
+                new_img[j,i] = src[y,x]
+
+    return new_img
+
+def fastwarp(H,src,h,w):
+    # create indices of the destination image and linearize them
+    indy, indx = np.indices((h, w), dtype=np.float32)
+    lin_homg_ind = np.array([indx.ravel(), indy.ravel(), np.ones_like(indx).ravel()])
+
+    # warp the coordinates of src to those of true_dst
+    map_ind = H.dot(lin_homg_ind)
+    map_x, map_y = map_ind[:-1]/map_ind[-1] 
+    map_x = map_x.reshape(h,w).astype(np.float32)
+    map_y = map_y.reshape(h,w).astype(np.float32)
 
     new_img = cv2.remap(src, map_x, map_y, cv2.INTER_LINEAR)
     
