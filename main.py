@@ -6,12 +6,12 @@ import time
 
 write_to_video = False
 show_contours = False
-Dog_mode = True
-Cube_mode = False
+Dog_mode = False
+Cube_mode = True
 video_src = 3 # 1 for data1, 2 for data2, 3 for data3
 Smooth_mode = False
 Fast_mode = False # Wont show the frame to screen. Best for write_to_video=True
-Fast_warp = False
+Fast_warp = True
 
 # Cube settings
 face_color = (100, 100, 100) 

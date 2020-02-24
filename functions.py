@@ -109,17 +109,15 @@ def warp(H,src,h,w):
     map_y[map_y>=src.shape[0]] = -1
     map_x[map_y<0] = -1
 
-
-
-    for i in range(w):
-        for j in range(h):
-            x = int(map_x[j,i])
-            y = int(map_y[j,i])
+    for new_x in range(w):
+        for new_y in range(h):
+            x = int(map_x[new_y,new_x])
+            y = int(map_y[new_y,new_x])
 
             if x == -1 or y == -1:
                 pass
             else:
-                new_img[j,i] = src[y,x]
+                new_img[new_y,new_x] = src[y,x]
 
     return new_img
 
@@ -220,7 +218,7 @@ def getCorners(frame):
         H_inv = np.linalg.inv(H)
         
         #get squared tile
-        square_img = warp(H_inv,frame,dim,dim)
+        square_img = fastwarp(H_inv,frame,dim,dim)
         imgray = cv2.cvtColor(square_img, cv2.COLOR_BGR2GRAY)
         ret, square_img = cv2.threshold(imgray, 180, 255, cv2.THRESH_BINARY)
         
@@ -260,19 +258,26 @@ def getCorners(frame):
     return tag_corners
 
 
-def avgCorners(p2, p1, current, f1, f2):
+def avgCorners(past, current, future):
     diff = 30
     average_corners={}
     for tag in current:
         templist=[current[tag]]
-        if tag in p1:
-            templist.append(p1[tag])
-        elif tag in p2:
-            templist.append(p2[tag])
-        if tag in f1:
-            templist.append(f1[tag])
-        elif tag in f2:
-            templist.append(f2[tag])
+        if past == []:
+            pass
+        elif tag in past[-1]:
+            for d in past:
+                if tag in d:
+                    templist.append(d[tag])
+        else:
+            pass
+
+        if tag in future[0]:
+            for d in future:
+                if tag in d:
+                    templist.append(d[tag])
+        else:
+            pass
         
         newcorners=[]
         c1x=0

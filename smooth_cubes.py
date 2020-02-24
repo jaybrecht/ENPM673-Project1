@@ -1,0 +1,83 @@
+import cv2
+import math
+from functions import*
+from cube import*
+import time
+
+# Cube settings
+face_color = (100, 100, 100) 
+edge_color = (0, 0, 0)
+
+write_to_video = False
+video_src = 3 # 1 for data1, 2 for data2, 3 for data3 
+num_future_frames = 5 
+start_frame = 100
+
+video = cv2.VideoCapture('data/data_'+str(video_src)+'.mp4') 
+
+if write_to_video:
+    fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    today = time.strftime("%m-%d__%H.%M.%S")
+    videoname=str(today)+"smooth_cube"+str(video_src)
+    fps_out = 29
+    out = cv2.VideoWriter(str(videoname)+".avi", fourcc, fps_out, (1920, 1080))
+    print("Writing to Video, Please Wait")
+
+frame_num = start_frame
+video.set(1,start_frame)
+
+fut_frames,past_frames = [], []
+flag = False
+
+while(video.isOpened()):
+    print("Frame: " + str(frame_num))
+    if frame_num == start_frame:
+        ret,cur_frame = video.read()
+        for num in range(num_future_frames):
+            ret,frontier = video.read()
+            fut_frames.append(frontier)
+    else:
+        cur_frame = fut_frames.pop(0)
+        ret,frontier = video.read()
+        fut_frames.append(frontier)
+
+    cur_bot = getCorners(cur_frame)
+    cur_top = getTopCorners(cur_bot)
+
+    p_bot,p_top,f_bot,f_top = [],[],[],[]
+
+    for pframe in past_frames:
+        d = getCorners(pframe)
+        p_bot.append(d)
+        p_top.append(getTopCorners(d))
+
+    for fframe in fut_frames:
+        d = getCorners(fframe)
+        f_bot.append(d)
+        f_top.append(getTopCorners(d))
+
+    bot_corners=avgCorners(p_bot, cur_bot, f_bot)
+    top_corners=avgCorners(p_top, cur_top, f_top)
+
+    frame = cur_frame.copy()
+    for tag_id in bot_corners:
+        set1 = bot_corners[tag_id]
+        set2 = top_corners[tag_id]
+        frame=drawCube(set1,set2,frame,face_color,edge_color,flag)
+
+    past_frames.append(cur_frame)
+    if(len(past_frames) > num_future_frames):
+        past_frames.pop(0)
+
+    cv2.imshow("Smooth Cubes",frame)
+
+    if cv2.waitKey(1) == ord('q'):
+            break
+
+    frame_num += 1
+
+    if write_to_video:
+        out.write(frame)
+
+if write_to_video:
+    out.release()
