@@ -150,18 +150,24 @@ def fastwarp(H,src,h,w):
 
 
 def encode_tag(square_img):
+    report_img = np.zeros((square_img.shape[0],square_img.shape[0],3), np.uint8)
     dim = square_img.shape[0]
     grid_size = 8
     k = dim//grid_size
     sx = 0
     sy = 0
+    font = cv2.FONT_HERSHEY_SIMPLEX 
     encoding = np.zeros((grid_size,grid_size))
     for i in range(grid_size):
         for j in range(grid_size):
             roi = square_img[sy:sy+k, sx:sx+k]
-            cv2.rectangle(square_img,(sx,sy),(sx+k,sy+k),(150),2)
             if roi.mean() > 255//2:
                 encoding[i][j] = 1
+                cv2.rectangle(report_img,(sx,sy),(sx+k,sy+k),(255,255,255),-1)
+                # cv2.putText(report_img,'1',(sx+int(k*.3),sy+int(k*.7)),font,.6,(255,0,0),2)
+            # else:
+                # cv2.putText(report_img,'0',(sx+int(k*.3),sy+int(k*.7)),font,.6,(255,0,0),2)
+            cv2.rectangle(report_img,(sx,sy),(sx+k,sy+k),(127,127,127),1)
             sx += k
         sx = 0
         sy += k
@@ -173,31 +179,36 @@ def encode_tag(square_img):
     c = str(int(encoding[4][4]))
     d = str(int(encoding[4][3]))
 
+    cv2.putText(report_img,a,(3*k+int(k*.3),3*k+int(k*.7)),font,.6,(227,144,27),2)
+    cv2.putText(report_img,b,(4*k+int(k*.3),3*k+int(k*.7)),font,.6,(227,144,27),2)
+    cv2.putText(report_img,d,(3*k+int(k*.3),4*k+int(k*.7)),font,.6,(227,144,27),2)
+    cv2.putText(report_img,c,(4*k+int(k*.3),4*k+int(k*.7)),font,.6,(227,144,27),2)
+
     if encoding[5,5] == 1:
         orientation = 3
         id_str = a+b+c+d
         center = (5*k+(k//2),5*k+(k//2))
-        cv2.circle(square_img,center,k//4,125)
+        cv2.circle(report_img,center,k//4,(0,0,255),-1)
     elif encoding[2,5] == 1:
         orientation = 2
         id_str = d+a+b+c
         center = (5*k+(k//2),2*k+(k//2))
-        cv2.circle(square_img,center,k//4,125)
+        cv2.circle(report_img,center,k//4,(0,0,255),-1)
     elif encoding[2,2] == 1:
         orientation = 1
         id_str = c+d+a+b
         center = (2*k+(k//2),2*k+(k//2))
-        cv2.circle(square_img,center,k//4,125)
+        cv2.circle(report_img,center,k//4,(0,0,255),-1)
     elif encoding[5,2] == 1:
         orientation = 0
         id_str = b+c+d+a
         center = (2*k+(k//2),5*k+(k//2))
-        cv2.circle(square_img,center,k//4,125)
+        cv2.circle(report_img,center,k//4,(0,0,255),-1)
     else:
         orientation = 0
         id_str = '0000'
 
-    return [square_img,id_str,orientation]
+    return [report_img,id_str,orientation]
 
 
 def rotate_img(img,orientation):
