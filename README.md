@@ -42,7 +42,7 @@ You can use any of these three videos with any combination of other modes.
 
 # Smooth Cubes
 There is another executable program in this set: `smooth_cubes.py`. This program renders cubes with less jittery motion. It uses a forward and backward looking approach, averaging the cube corner positions over several preceeding and post frames. Cube faces are also colored to correspond to their unique tag IDs. 
-![colored_cubes](https://github.com/jaybrecht/ENPM673-Project1/blob/master/images/color_cubes.png)
+![colored_cubes](https://github.com/jaybrecht/ENPM673-Project1/blob/master/images/colored_cubes.png)
 Similarly to `main.py`, there are several customizable program parameters that can be adjusted at the top of `smooth_cubes.py`: 
 
 Once again, `write_to_video` toggles saving the output video file and `video_src` changes the input source video.
