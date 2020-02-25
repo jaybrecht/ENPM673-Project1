@@ -26,6 +26,8 @@ Cube_mode displays a cube on each tag. You can run `Dog_mode` and `Cube_mode` at
 ![cube_mode](https://github.com/jaybrecht/ENPM673-Project1/blob/master/images/cube_mode.png)
 
 You can change the color of the cube faces by editing `face_color` near the top of `main.py`. The colors are in (B,G,R) from 0-255. Similarly, you can edit the color of the cube edges by changing `edge_color` near the top of `main.py`.
+The cube faces can also be colored to correspond to their unique tag IDs. 
+![colored_cubes](https://github.com/jaybrecht/ENPM673-Project1/blob/master/images/colored_cubes.png)
 
 
 ## video_src
@@ -41,9 +43,7 @@ You can use any of these three videos with any combination of other modes.
 
 
 # Smooth Cubes
-There is another executable program in this set: `smooth_cubes.py`. This program renders cubes with less jittery motion. It uses a forward and backward looking approach, averaging the cube corner positions over several preceeding and post frames. Cube faces are also colored to correspond to their unique tag IDs. 
-![colored_cubes](https://github.com/jaybrecht/ENPM673-Project1/blob/master/images/colored_cubes.png)
-Similarly to `main.py`, there are several customizable program parameters that can be adjusted at the top of `smooth_cubes.py`: 
+There is another executable program in this set: `smooth_cubes.py`. This program renders cubes with less jittery motion. It uses a forward and backward looking approach, averaging the cube corner positions over several preceeding and post frames. Similarly to `main.py`, there are several customizable program parameters that can be adjusted at the top of `smooth_cubes.py`: 
 
 Once again, `write_to_video` toggles saving the output video file and `video_src` changes the input source video.
 `num_future_frames` is the number of frames (in both directions) to average the points over. This smoothing function works for an arbitrary number of preceding and post frames, allowing for varying amounts of smoothing. The more frames that are averaged results in a smoother, less jittery cube, but may cause cube drift, where the cube position slides slightly from the tag due to camera movement in neighboring frames. Cube drift becomes more noticeable as the frame count increases.
