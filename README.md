@@ -53,7 +53,7 @@ Once again, `write_to_video` toggles saving the output video file and `video_src
 
 
 # Videos
-##1 Tag
+## 1 Tag
 
 Dog: https://youtu.be/eMDw7v8iKVM
 
@@ -68,7 +68,7 @@ Cube and Dog: https://youtu.be/XJA6ZihT7dM
 Cube, Dog, and Contours: https://youtu.be/5Ye-M5kQ49s
 
 
-##1 Tag - Smoothed
+## 1 Tag - Smoothed
 
 Cube (4 frames, with color): https://youtu.be/e78oBha6Y-k
 
@@ -77,7 +77,7 @@ Cube (5 frames): https://youtu.be/ptrkv0mcJ-o
 Cube (15 frames): https://youtu.be/4-SMcVtxhTY
 
 
-##2 Tags
+## 2 Tags
 
 Dogs: https://youtu.be/W07xNjdikj4
 
@@ -92,14 +92,14 @@ Cubes and Dogs: https://youtu.be/G0JwnAY8btk
 Cubes, Dogs, and Contours: https://youtu.be/SjvsdsYbnNc
 
 
-##2 Tags - Smoothed
+## 2 Tags - Smoothed
 
 Cubes (4 frames, with color): https://youtu.be/LD1vFiq3ZNg
 
 Cubes: (5 frames) https://youtu.be/WOoJEzgwbFA
 
 
-##3 Tags
+## 3 Tags
 
 Dogs: https://youtu.be/6kUJMu_lp6s
 
@@ -116,7 +116,7 @@ Cubes, Dogs, and Contours: https://youtu.be/j1lANCtlTnI
 
 
 
-##3 Tags - Smoothed
+## 3 Tags - Smoothed
 Cubes (4 Frames, with color): https://youtu.be/bwa-wyenpoI
 
 Cubes (5 Frames): https://youtu.be/UzQukBC6EkI
