@@ -14,7 +14,7 @@ Fast_mode = False # Wont show the frame to screen. Best for write_to_video=True
 Fast_warp = True
 
 # Cube settings
-face_color = (100, 100, 100) 
+face_colors = [(0, 127, 255),(255, 127, 0),(0, 191, 0)] 
 edge_color = (0, 0, 0) 
 
 if write_to_video:
@@ -59,9 +59,13 @@ while(video.isOpened()):
         flag = False
 
         for i,tag in enumerate(corners):
+            # find number of points in the polygon
+            num_points = num_points_in_poly(frame,tag_cnts[i])
+   
             #compute homography
-            dim = 200
+            dim = int(math.sqrt(num_points))
             H = homography(tag,dim)
+
             H_inv = np.linalg.inv(H)
 
             #get squared tile
@@ -74,8 +78,6 @@ while(video.isOpened()):
 
             #encode squared tile
             [tag_img,id_str,orientation] = encode_tag(square_img)
-            # cv2.imshow("Tag",tag_img)
-            # cv2.waitKey(0)
         
             if Dog_mode:
                  #pick image based on id
@@ -107,7 +109,12 @@ while(video.isOpened()):
                 flag = True
 
             if Cube_mode:
-            # Find new cube points and draw on image
+                # Find new cube points and draw on image
+                if id_str in tag_ids:
+                    index = tag_ids.index(id_str)
+                    face_color = face_colors[index]
+                else:
+                    continue
                 H=homography(tag,200)
                 H_inv = np.linalg.inv(H)
                 P=projection_mat(K,H_inv)

@@ -21,6 +21,16 @@ def findcontours(frame,threshold):
     return [all_cnts,cnts]
 
 
+def num_points_in_poly(frame,contour):
+    H = frame.shape[0]
+    L = frame.shape[1]
+    matrix =np.zeros((H,L),dtype=np.int32)
+    cv2.drawContours(matrix,[contour],-1,(1),thickness=-1)
+    inds=np.nonzero(matrix)
+    num_points = len(inds[0])
+    return num_points
+
+
 def approx_quad(cnts):
     tag_cnts = []
     for c in cnts:

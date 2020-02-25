@@ -5,7 +5,7 @@ from cube import*
 import time
 
 # Cube settings
-face_colors = [(255, 0, 0),(0, 255, 0),(0, 0, 255)] 
+face_colors = [(0, 127, 255),(255, 127, 0),(0, 191, 0)] 
 tag_ids = ['0101','0111','1111']
 edge_color = (0, 0, 0)
 
@@ -34,6 +34,7 @@ p_bot,p_top = [],[]
 
 while(video.isOpened()):
     print("Frame: " + str(frame_num))
+    
     if frame_num == start_frame:
         ret,cur_frame = video.read()
         for num in range(num_future_frames):
@@ -43,6 +44,7 @@ while(video.isOpened()):
         cur_frame = fut_frames.pop(0)
         ret,frontier = video.read()
         fut_frames.append(frontier)
+    
     if ret:
         cur_bot = getCorners(cur_frame)
         cur_top = getTopCorners(cur_bot)
