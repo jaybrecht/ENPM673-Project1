@@ -40,6 +40,11 @@ This allows you to change which of the three available videos are used in the pr
 You can use any of these three videos with any combination of other modes. 
 
 
-# How It Works
+# Smooth Cubes
+There is another executable program in this set: `smooth_cubes.py`. This program renders cubes with less jittery motion. It uses a forward and backward looking approach, averaging the cube corner positions over several preceeding and post frames. Cube faces are also colored to correspond to their unique tag IDs. Similarly to `main.py`, there are several customizable program parameters that can be adjusted at the top of `smooth_cubes.py`: 
+
+Once again, `write_to_video` toggles saving the output video file and `video_src` changes the input source video.
+`num_future_frames` is the number of frames (in both directions) to average the points over. This smoothing function works for an arbitrary number of preceding and post frames, allowing for varying amounts of smoothing. The more frames that are averaged results in a smoother, less jittery cube, but may cause cube drift, where the cube position slides slightly from the tag due to camera movement in neighboring frames. Cube drift becomes more noticeable as the frame count increases.
+
 
 
