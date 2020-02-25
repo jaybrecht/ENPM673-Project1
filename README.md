@@ -50,6 +50,21 @@ Once again, `write_to_video` toggles saving the output video file and `video_src
 
 
 
+# Notes on Usage
+Everything is designed to run in Python 3.7. Download the entire directory before beginning (all files are required). Open `main.py` and adjust the toggle parameters to the configuration you want to run. Save the file and run `python3 main.py` in Terminal. The run may take several minutes, depending on the configuration selected.
+
+You can also run `smooth_cubes.py` in the same fashion. We do not recommend running `main.py` and `smooth_cubes.py` simultaneously. 
+
+
+
+## Required Packages
+The following packages are required for this project:
+* numpy
+* cv2
+* math
+* time
+
+
 
 
 # Videos
