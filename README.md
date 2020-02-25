@@ -66,7 +66,7 @@ The following packages are required for this project:
 
 
 # How it Works
-For a more detailed overview of program functionality and processes, please read our report (ENPM673_Project1.pdf)
+For a more detailed overview of program functionality and processes, please read our report (Report.pdf)
 
 
 # Videos
