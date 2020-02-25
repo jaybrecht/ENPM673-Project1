@@ -102,6 +102,55 @@ def makeContours(corners1,corners2):
 	return contours
 
 
+def getCorners(frame):
+    [all_cnts,cnts] = findcontours(frame,180)
+    #approximate quadralateral to each contour and extract corners
+    [tag_cnts,corners] = approx_quad(cnts)
+
+    tag_corners={}
+
+    for i,tag in enumerate(corners):
+        #compute homography
+        dim = 200
+        H = homography(tag,dim)
+        H_inv = np.linalg.inv(H)
+        
+        #get squared tile
+        square_img = fastwarp(H_inv,frame,dim,dim)
+        imgray = cv2.cvtColor(square_img, cv2.COLOR_BGR2GRAY)
+        ret, square_img = cv2.threshold(imgray, 180, 255, cv2.THRESH_BINARY)
+        
+        #encode squared tile
+        [tag_img,id_str,orientation] = encode_tag(square_img)
+
+        ordered_corners=[]
+
+        if orientation==0:
+            ordered_corners=tag
+
+        elif orientation==1:
+            ordered_corners.append(tag[1])
+            ordered_corners.append(tag[2])
+            ordered_corners.append(tag[3])
+            ordered_corners.append(tag[0])
+
+        elif orientation==2:
+            ordered_corners.append(tag[2])
+            ordered_corners.append(tag[3])
+            ordered_corners.append(tag[0])
+            ordered_corners.append(tag[1])
+
+        elif orientation==3:
+            ordered_corners.append(tag[3])
+            ordered_corners.append(tag[0])
+            ordered_corners.append(tag[1])
+            ordered_corners.append(tag[2])
+        
+        tag_corners[id_str] = ordered_corners
+        
+    return tag_corners
+
+
 def getTopCorners(bot_corners):
 	K = np.array([[1406.08415449821,0,0],
 			[2.20679787308599, 1417.99930662800,0],
@@ -116,3 +165,59 @@ def getTopCorners(bot_corners):
 		top_corners[tag_id] = cubePoints(corners, H, P, 200)
 
 	return top_corners
+
+
+def avgCorners(past, current, future):
+    diff = 50
+    average_corners={}
+    for tag in current:
+        templist=[current[tag]]
+        if past == []:
+            pass
+        elif tag in past[-1]:
+            for d in past:
+                if tag in d:
+                    templist.append(d[tag])
+        else:
+            pass
+
+        if tag in future[0]:
+            for d in future:
+                if tag in d:
+                    templist.append(d[tag])
+        else:
+            pass
+        
+        newcorners=[]
+        c1x=c1y=c2x=c2y=c3x=c3y=c4x=c4y=0
+
+        for allcorners in templist:
+            c1x+=allcorners[0][0]
+            c1y+=allcorners[0][1]
+            c2x+=allcorners[1][0]
+            c2y+=allcorners[1][1]
+            c3x+=allcorners[2][0]
+            c3y+=allcorners[2][1]
+            c4x+=allcorners[3][0]
+            c4y+=allcorners[3][1]
+
+        newcorners=np.array([[c1x,c1y],[c2x,c2y],[c3x,c3y],[c4x,c4y]])
+        newcorners=np.divide(newcorners,len(templist))
+        newcorners=newcorners.astype(int)
+        newcorners=np.ndarray.tolist(newcorners)
+
+        # If any coner value is > n pixels from original keep original
+        teleport = False
+        for i in range(4):
+            orig_x = current[tag][i][0]
+            orig_y = current[tag][i][1]
+            new_x = newcorners[i][0]
+            new_y = newcorners[i][1]
+            if (abs(orig_x-new_x) > diff) or (abs(orig_y-new_y) > diff):
+                teleport = True
+        if teleport:
+            average_corners[tag] = current[tag] 
+        else:
+            average_corners[tag] = newcorners
+        
+    return average_corners

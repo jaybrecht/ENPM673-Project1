@@ -97,7 +97,12 @@ while(video.isOpened()):
                     frame1 = fastwarp(H,rotated_img,h,w)
                 else:
                     frame1 = warp(H,rotated_img,h,w)
+
+                cv2.imshow("Frame1",frame1)
+                cv2.waitKey(0)
                 frame2 = blank_region(frame,tag_cnts[i],0)
+                cv2.imshow("Frame2",frame2)
+                cv2.waitKey(0)
                 frame = cv2.bitwise_or(frame1,frame2)
                 flag = True
 
